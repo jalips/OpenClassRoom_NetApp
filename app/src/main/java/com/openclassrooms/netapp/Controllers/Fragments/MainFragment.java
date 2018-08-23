@@ -51,10 +51,10 @@ public class MainFragment extends Fragment implements GithubUserAdapter.Listener
     private GithubUserAdapter adapter;
 
     // Declare callback
-    private ItemClickSupport.OnItemClickListener mCallback;
+    private MyItemClickListener mCallback;
 
     // Declare our interface that will be implemented by any container activity
-    public interface OnItemClickListener {
+    public interface MyItemClickListener {
         public void onItemClicked(GithubUser user);
     }
 
@@ -177,7 +177,7 @@ public class MainFragment extends Fragment implements GithubUserAdapter.Listener
     private void createCallbackToParentActivity(){
         try {
             //Parent activity will automatically subscribe to callback
-            mCallback = (ItemClickSupport.OnItemClickListener) getActivity();
+            mCallback = (MyItemClickListener) getActivity();
         } catch (ClassCastException e) {
             throw new ClassCastException(e.toString()+ " must implement OnButtonClickedListener");
         }

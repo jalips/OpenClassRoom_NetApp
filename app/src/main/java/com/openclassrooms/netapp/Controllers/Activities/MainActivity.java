@@ -3,15 +3,13 @@ package com.openclassrooms.netapp.Controllers.Activities;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.view.View;
 import android.widget.Toast;
 
 import com.openclassrooms.netapp.Controllers.Fragments.MainFragment;
 import com.openclassrooms.netapp.Models.GithubUser;
 import com.openclassrooms.netapp.R;
 
-public class MainActivity extends AppCompatActivity implements MainFragment.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements MainFragment.MyItemClickListener {
 
     private MainFragment mainFragment;
 
@@ -21,8 +19,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnIt
         setContentView(R.layout.activity_main);
 
         this.configureAndShowMainFragment();
-
-        startActivity(new Intent(this, DetailActivity.class));
     }
 
 
@@ -43,9 +39,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnIt
         }
     }
 
-    @Override
-    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
 
-        Toast.makeText(getContext(), "You are trying to delete user : "+user.getLogin(), Toast.LENGTH_SHORT).show();
+    @Override
+    public void onItemClicked(GithubUser user) {
+        Toast.makeText(this, "Go to DetailActivity with this user : "+user.getLogin(), Toast.LENGTH_SHORT).show();
+
+        //startActivity(new Intent(this, DetailActivity.class));
     }
 }
