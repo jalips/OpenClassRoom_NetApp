@@ -42,8 +42,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.MyIt
 
     @Override
     public void onItemClicked(GithubUser user) {
-        Toast.makeText(this, "Go to DetailActivity with this user : "+user.getLogin(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "Go to DetailActivity with this user : "+user.getLogin(), Toast.LENGTH_SHORT).show();
 
-        //startActivity(new Intent(this, DetailActivity.class));
+        // startActivity with extra 'id'
+        startActivity(new Intent(this, DetailActivity.class).putExtra("login", user.getLogin()));
     }
 }
