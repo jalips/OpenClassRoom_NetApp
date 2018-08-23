@@ -1,6 +1,8 @@
 package com.openclassrooms.netapp.Controllers.Fragments;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.openclassrooms.netapp.Controllers.Activities.DetailActivity;
+import com.openclassrooms.netapp.Controllers.Activities.MainActivity;
 import com.openclassrooms.netapp.Models.GithubUser;
 import com.openclassrooms.netapp.Models.GithubUserInfo;
 import com.openclassrooms.netapp.R;
@@ -35,7 +39,7 @@ import io.reactivex.observers.DisposableObserver;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MainFragment extends Fragment implements GithubUserAdapter.Listener {
+public class MainFragment extends Fragment implements GithubUserAdapter.Listener, ItemClickSupport.OnItemClickListener {
 
     // FOR DESIGN
     @BindView(R.id.fragment_main_recycler_view) RecyclerView recyclerView;
@@ -46,17 +50,37 @@ public class MainFragment extends Fragment implements GithubUserAdapter.Listener
     private List<GithubUser> githubUsers;
     private GithubUserAdapter adapter;
 
+    // Declare callback
+    private ItemClickSupport.OnItemClickListener mCallback;
+
+    // Declare our interface that will be implemented by any container activity
+    public interface OnItemClickListener {
+        public void onItemClicked(GithubUser user);
+    }
+
     public MainFragment() { }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        //Inflate the layout of MainFragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
+
         ButterKnife.bind(this, view);
         this.configureRecyclerView();
         this.configureSwipeRefreshLayout();
         this.configureOnClickRecyclerView();
         this.executeHttpRequestWithRetrofit();
+
         return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        // Call the method that creating callback after being attached to parent activity
+        this.createCallbackToParentActivity();
     }
 
     @Override
@@ -69,15 +93,17 @@ public class MainFragment extends Fragment implements GithubUserAdapter.Listener
     // ACTION
     // -----------------
 
+    @Override
+    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
+        GithubUser user = adapter.getUser(position);
+
+        // Spread the click to the parent activity
+        mCallback.onItemClicked(user);
+    }
+
     private void configureOnClickRecyclerView(){
-        ItemClickSupport.addTo(recyclerView, R.layout.fragment_main_item)
-                .setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                    @Override
-                    public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-                        GithubUser user = adapter.getUser(position);
-                        Toast.makeText(getContext(), "You clicked on user : "+user.getLogin(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+        // Set onClickListener to one item (of recycler view)
+        ItemClickSupport.addTo(recyclerView, R.layout.fragment_main_item).setOnItemClickListener(this);
     }
 
     @Override
@@ -142,4 +168,19 @@ public class MainFragment extends Fragment implements GithubUserAdapter.Listener
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
     }
+
+    // --------------
+    // FRAGMENT SUPPORT
+    // --------------
+
+    // 3 - Create callback to parent activity
+    private void createCallbackToParentActivity(){
+        try {
+            //Parent activity will automatically subscribe to callback
+            mCallback = (ItemClickSupport.OnItemClickListener) getActivity();
+        } catch (ClassCastException e) {
+            throw new ClassCastException(e.toString()+ " must implement OnButtonClickedListener");
+        }
+    }
+
 }
